@@ -1,40 +1,38 @@
 package com.trackit.studentmanager.student;
 
-import java.util.UUID;
+import lombok.*;
 
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+@ToString
+@Getter
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table
 public class Student {
-    private final UUID studentId;
-    private final String firstName;
-    private final String lastName;
-    private final String email;
-    private final Gender gender;
+    @Id
+    @SequenceGenerator(name = "student_sequence", sequenceName = "student_sequence", allocationSize = 1)
+    @GeneratedValue(generator = "student_sequence", strategy = GenerationType.SEQUENCE)
+    private Long id;
+    @NotBlank
+    @Column(nullable = false)
+    private String name;
+    @Email
+    @Column(nullable = false, unique = true)
+    private String email;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
-    public Student(UUID studentId, String firstName, String lastName, String email, Gender gender) {
-        this.studentId = studentId;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public Student(String name, String email, Gender gender) {
+        this.name = name;
         this.email = email;
         this.gender = gender;
-    }
-
-    public UUID getStudentId() {
-        return studentId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Gender getGender() {
-        return gender;
     }
 
     enum Gender {

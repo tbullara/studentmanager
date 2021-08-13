@@ -12,6 +12,17 @@ export class StudentClient {
             })
         });
     }
+
+    addStudent(student: IStudent) {
+        return new Promise<IStudent>((resolve, reject) => {
+            axios.post('/students', student).then((response: any) => {
+                resolve(response.data as IStudent)
+            })
+            .catch((response: any) => {
+                reject(response)
+            })
+        });
+    }
 }
 
 export const studentClient = new StudentClient();

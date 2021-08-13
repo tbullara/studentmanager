@@ -1,21 +1,32 @@
 package com.trackit.studentmanager.student;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("students")
+// same as setting up a default constructor
+@AllArgsConstructor
 public class StudentController {
+
+    private final StudentService studentService;
+
     @GetMapping
     public List<Student> getAllStudents() {
-        return List.of(
-                new Student(UUID.randomUUID(), "Mr.", "Cumstain", "mrcumstan@gmail.com", Student.Gender.OTHER),
-                new Student(UUID.randomUUID(), "Dr.", "Friend", "df@gmail.com", Student.Gender.MALE)
-        );
+        return studentService.getAllStudents();
+    }
+
+    @PostMapping
+    public void addStudent(@Valid @RequestBody Student student) {
+        studentService.addStudent(student);
+    }
+
+    @DeleteMapping(path = "{studentId}")
+    public void deleteStudent(@PathVariable("studentId") Long studentId) {
+        studentService.deleteStudent(studentId);
     }
 }

@@ -43,7 +43,28 @@ export class HttpClient implements IHttpClient {
                 reject(response)
             })
         });
-    }  
+    }
+
+    delete<T>(args: IHttpClientRequestArgs<T>): Promise<T> {
+        return new Promise<T>((resolve, reject) => {
+            const { url, requiresToken, payload } = args
+
+            const options: AxiosRequestConfig = {
+                headers: {}
+            }
+
+            if (requiresToken) {
+                // TODO: get and set token
+            }
+
+            axios.delete(url).then((response: any) => {
+                resolve(response.data as T)
+            })
+            .catch((response: any) => {
+                reject(response)
+            })
+        });
+    }
 }
 
 export const httpClient = new HttpClient();
