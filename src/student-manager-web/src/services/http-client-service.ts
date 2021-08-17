@@ -65,6 +65,7 @@ export class HttpClient implements IHttpClient {
             })
         });
     }
+
 }
 
 export const httpClient = new HttpClient();
