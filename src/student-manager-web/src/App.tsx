@@ -1,7 +1,7 @@
 import React, { Component, FC, useEffect, useState } from 'react';
 import './App.css';
 import { IHttpClientRequestArgs } from './interfaces/http-client-args';
-import { IStudent } from './interfaces/student';
+import { IUser } from './models/user';
 import { httpClient } from './services/http-client-service';
 import { Table, Spin, Layout, Menu, Breadcrumb, Empty, Button, Badge, Tag, Radio, Popconfirm } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
@@ -35,11 +35,11 @@ const UserAvatar: Function = ({name}: FC<string>) => {
 }
 
 const deleteStudent: Function = (studentId: number, callback: Function) => {
-  const params: IHttpClientRequestArgs<IStudent> = {
+  const params: IHttpClientRequestArgs<IUser> = {
     url: `students/${studentId}`,
     requiresToken: false
   }
-  httpClient.delete<IStudent>(params).then(() => {
+  httpClient.delete<IUser>(params).then(() => {
     successNotif("Student deleted", `Student #${studentId} deleted successfully.`);
     callback();
   })
@@ -50,8 +50,8 @@ const columns: Function = (fetchStudents: any) => [
     title: '',
     dataIndex: 'avatar',
     key: 'avatar',
-    render: (text: string, student: IStudent) => {
-        <UserAvatar name={student.name}/> 
+    render: (text: string, student: IUser) => {
+        <UserAvatar name={student.profile.name}/> 
     }
   },
   {
@@ -78,11 +78,11 @@ const columns: Function = (fetchStudents: any) => [
     title: 'Actions',
     dataIndex: 'actions',
     key: 'actions',
-    render: (text: string, student: IStudent) =>
+    render: (text: string, student: IUser) =>
       <Radio.Group>
         <Popconfirm
           placement='topRight'
-          title={`Are you sure you want to delete ${student.name}`}
+          title={`Are you sure you want to delete ${student.profile.name}`}
           onConfirm={() => deleteStudent(student.id, fetchStudents)}
           okText='Yes'
           cancelText='No'
@@ -97,18 +97,18 @@ const columns: Function = (fetchStudents: any) => [
 const loader = <LoadingOutlined type="loading" style={{ fontSize: 24 }} />;
 
 function App() {
-  const [students, setStudents] = useState<IStudent[]>([]);
+  const [students, setStudents] = useState<IUser[]>([]);
   const [render, updateRender] = useState(0);
   const [fetching, setFetching] = useState(true);
   const [showDrawer, setShowDrawer] = useState(false);
 
   const fetchStudents = () => {
-    const params: IHttpClientRequestArgs<IStudent[]> = {
+    const params: IHttpClientRequestArgs<IUser[]> = {
       url: 'students',
       requiresToken: false
     }
 
-    httpClient.get<IStudent[]>(params).then((data: IStudent[]) => {
+    httpClient.get<IUser[]>(params).then((data: IUser[]) => {
       setStudents(data);
     }).catch(err => {
         errorNotif(err.message, "sumn fucked up");

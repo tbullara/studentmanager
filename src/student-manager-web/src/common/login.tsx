@@ -9,12 +9,28 @@ import { Sidebar } from './sidebar';
 import { Content, Footer } from 'antd/lib/layout/layout';
 import Title from 'antd/lib/typography/Title';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { IUser } from '../models/user';
+import { IHttpClientRequestArgs } from '../interfaces/http-client-args';
+import { httpClient } from '../services/http-client-service';
 
 
 export const Login: () => JSX.Element = () => {
-  const onFinish = (values: any) => {
-    console.log('Success:', values);
-  };
+  const [submitting, setSubmitting] = useState(false);
+    
+    const onFinish = (student: IUser) => {
+        setSubmitting(true);
+        const params: IHttpClientRequestArgs<IUser> = {
+            url: 'students',
+            requiresToken: false,
+            payload: student
+          }
+      
+          httpClient.post<IUser>(params).then(() => {
+            
+          }).catch(err => {
+          }).finally(() => setSubmitting(false));
+    };
 
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
