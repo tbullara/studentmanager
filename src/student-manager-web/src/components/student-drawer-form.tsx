@@ -3,7 +3,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { ExtendedDrawerProps } from "../interfaces/extended-drawer-props";
 import { IHttpClientRequestArgs } from "../interfaces/http-client-args";
-import { IStudent } from "../interfaces/student";
+import { IUser } from "../models/user";
 import { httpClient } from "../services/http-client-service";
 import { errorNotif, successNotif } from "./notifications";
 
@@ -14,17 +14,17 @@ export const NewStudentForm: Function = ({showDrawer, setShowDrawer, fetchStuden
     const onClose = () => setShowDrawer(false);
     const [submitting, setSubmitting] = useState(false);
     
-    const onFinish = (student: IStudent) => {
+    const onFinish = (student: IUser) => {
         setSubmitting(true);
-        const params: IHttpClientRequestArgs<IStudent> = {
+        const params: IHttpClientRequestArgs<IUser> = {
             url: 'students',
             requiresToken: false,
             payload: student
           }
       
-          httpClient.post<IStudent>(params).then(() => {
+          httpClient.post<IUser>(params).then(() => {
             onClose();
-            successNotif('Submission Success', `Successfully submitted student: ${student.name}`);
+            successNotif('Submission Success', `Successfully submitted student: ${student.profile.name}`);
             fetchStudents();
           }).catch(err => {
               // type?

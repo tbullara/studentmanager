@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { IStudent } from '../interfaces/student';
+import { IUser } from '../models/user';
 
 export class StudentClient {
-    getStudents(): Promise<IStudent[]> {
-        return new Promise<IStudent[]>((resolve, reject) => {
+    getStudents(): Promise<IUser[]> {
+        return new Promise<IUser[]>((resolve, reject) => {
             axios.get('/students').then((response: any) => {
-                resolve(response.data as IStudent[])
+                resolve(response.data as IUser[])
             })
             .catch((response: any) => {
                 reject(response)
@@ -13,10 +13,10 @@ export class StudentClient {
         });
     }
 
-    addStudent(student: IStudent) {
-        return new Promise<IStudent>((resolve, reject) => {
+    addStudent(student: IUser) {
+        return new Promise<IUser>((resolve, reject) => {
             axios.post('/students', student).then((response: any) => {
-                resolve(response.data as IStudent)
+                resolve(response.data as IUser)
             })
             .catch((response: any) => {
                 reject(response)

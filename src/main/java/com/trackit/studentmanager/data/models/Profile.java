@@ -1,10 +1,9 @@
-package com.trackit.studentmanager.student;
+package com.trackit.studentmanager.data.models;
 
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @ToString
@@ -14,26 +13,28 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Entity
 @Table
-public class Student {
+public class Profile {
     @Id
-    @SequenceGenerator(name = "student_sequence", sequenceName = "student_sequence", allocationSize = 1)
-    @GeneratedValue(generator = "student_sequence", strategy = GenerationType.SEQUENCE)
-    private Long id;
-    @NotBlank
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long profile_id;
+
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false, unique = true)
+    private String phone;
+
     @Email
     @Column(nullable = false, unique = true)
     private String email;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    public Student(String name, String email, Gender gender) {
-        this.name = name;
-        this.email = email;
-        this.gender = gender;
-    }
+    @OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private User user;
 
     enum Gender {
         MALE,

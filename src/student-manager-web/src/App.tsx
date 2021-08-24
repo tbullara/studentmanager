@@ -1,24 +1,24 @@
 import React, { Component, FC, useEffect, useState } from 'react';
 import './App.css';
 import { IHttpClientRequestArgs } from './interfaces/http-client-args';
-import { IStudent } from './interfaces/student';
+import { IUser } from './models/user';
 import { httpClient } from './services/http-client-service';
 import { Table, Spin, Layout, Menu, Breadcrumb, Empty, Button, Badge, Tag, Radio, Popconfirm } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import Avatar, { AvatarProps } from 'antd/lib/avatar/avatar';
 import {
-  DesktopOutlined,
-  PieChartOutlined,
-  FileOutlined,
-  TeamOutlined,
   UserOutlined,
   PlusCircleOutlined
 } from '@ant-design/icons';
 import { NewStudentForm } from './components/student-drawer-form';
 import { errorNotif, successNotif } from './components/notifications';
+import { Sidebar } from './common/sidebar';
+import { Topbar } from './common/topbar';
+import { Login } from './common/login';
+import { Dashboard } from './common/dashboard';
+import { Analytics } from './components/analytics';
 
-const { Header, Content, Footer, Sider } = Layout;
-const { SubMenu } = Menu;
+const { Header, Content, Footer } = Layout;
 
 const UserAvatar: Function = ({name}: FC<string>) => {
   let trim = name.trim();
@@ -35,11 +35,11 @@ const UserAvatar: Function = ({name}: FC<string>) => {
 }
 
 const deleteStudent: Function = (studentId: number, callback: Function) => {
-  const params: IHttpClientRequestArgs<IStudent> = {
+  const params: IHttpClientRequestArgs<IUser> = {
     url: `students/${studentId}`,
     requiresToken: false
   }
-  httpClient.delete<IStudent>(params).then(() => {
+  httpClient.delete<IUser>(params).then(() => {
     successNotif("Student deleted", `Student #${studentId} deleted successfully.`);
     callback();
   })
@@ -50,8 +50,8 @@ const columns: Function = (fetchStudents: any) => [
     title: '',
     dataIndex: 'avatar',
     key: 'avatar',
-    render: (text: string, student: IStudent) => {
-        <UserAvatar name={student.name}/> 
+    render: (text: string, student: IUser) => {
+        <UserAvatar name={student.profile.name}/> 
     }
   },
   {
@@ -78,11 +78,11 @@ const columns: Function = (fetchStudents: any) => [
     title: 'Actions',
     dataIndex: 'actions',
     key: 'actions',
-    render: (text: string, student: IStudent) =>
+    render: (text: string, student: IUser) =>
       <Radio.Group>
         <Popconfirm
           placement='topRight'
-          title={`Are you sure you want to delete ${student.name}`}
+          title={`Are you sure you want to delete ${student.profile.name}`}
           onConfirm={() => deleteStudent(student.id, fetchStudents)}
           okText='Yes'
           cancelText='No'
@@ -97,18 +97,18 @@ const columns: Function = (fetchStudents: any) => [
 const loader = <LoadingOutlined type="loading" style={{ fontSize: 24 }} />;
 
 function App() {
-  const [students, setStudents] = useState<IStudent[]>([]);
-  const [collapsed, setCollapsed] = useState(false);
+  const [students, setStudents] = useState<IUser[]>([]);
+  const [render, updateRender] = useState(0);
   const [fetching, setFetching] = useState(true);
   const [showDrawer, setShowDrawer] = useState(false);
 
   const fetchStudents = () => {
-    const params: IHttpClientRequestArgs<IStudent[]> = {
+    const params: IHttpClientRequestArgs<IUser[]> = {
       url: 'students',
       requiresToken: false
     }
 
-    httpClient.get<IStudent[]>(params).then((data: IStudent[]) => {
+    httpClient.get<IUser[]>(params).then((data: IUser[]) => {
       setStudents(data);
     }).catch(err => {
         errorNotif(err.message, "sumn fucked up");
@@ -124,7 +124,7 @@ function App() {
       return <Spin indicator={loader}/>
     }
 
-    if (students.length <= 0) {
+    if (students === undefined || students.length <= 0) {
       return <>
           <Button
               onClick={() => setShowDrawer(!showDrawer)}
@@ -168,48 +168,45 @@ function App() {
       />
     </>
   }
+
+  const components: any = {
+    1: 'poo',
+    2: <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>{renderStudents()}</div>,
+    3: <Analytics />,
+    4: <h1> 4 </h1>,
+    5: <h1> 5 </h1>,
+    8: <h1> home </h1>,
+    9: <Login />,
+    10: <h1> about </h1>
+  }
+
+  const handleSideBarClick = (menu: any) => {
+    updateRender(menu.key)
+  }
+
   return <>
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={(setCollapsed)}>
-        <div className="logo" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-          <Menu.Item key="1" icon={<PieChartOutlined />}>
-            Admin
-          </Menu.Item>
-          <Menu.Item key="2" icon={<DesktopOutlined />}>
-            Analytics
-          </Menu.Item>
-          <SubMenu key="sub1" icon={<UserOutlined />} title="User">
-            <Menu.Item key="3">Tucker</Menu.Item>
-          </SubMenu>
-          <SubMenu key="sub2" icon={<TeamOutlined />} title="Team">
-            <Menu.Item key="6">Team 1</Menu.Item>
-            <Menu.Item key="8">Team 2</Menu.Item>
-          </SubMenu>
-          <Menu.Item key="9" icon={<FileOutlined />}>
-            Files
-          </Menu.Item>
-        </Menu>
-      </Sider>
+    <Layout>
+      <Header className="header">
+        <div className="logo"/>
+        <Topbar />
+      </Header>
       <Layout className="site-layout">
-        <Header className="site-layout-background" style={{ padding: 0 }} />
-        <Content style={{ margin: '0 16px' }}>
+        <Sidebar handleClick={handleSideBarClick} />
+        <Layout style={{ padding: '0 24px 24px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
+            <Breadcrumb.Item>Home</Breadcrumb.Item>
+            <Breadcrumb.Item>List</Breadcrumb.Item>
+            <Breadcrumb.Item>App</Breadcrumb.Item>
           </Breadcrumb>
-          <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-            {renderStudents()}
-          </div>
-        </Content>
-        <Footer style={{ textAlign: 'center' }}>Student Manager Web ©2021.1.0</Footer>
+          <Content style={{overflow: 'initial' }}>
+            {components[render]}
+          </Content>
+          <Footer style={{ textAlign: 'center' }}>Student Manager Web ©2021.1.0</Footer>
+        </Layout>
       </Layout>
     </Layout>
   </>
 }
 
 export default App;
-function successNotification(arg0: string, arg1: string) {
-  throw new Error('Function not implemented.');
-}
 
